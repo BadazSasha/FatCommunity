@@ -1,0 +1,89 @@
+﻿@model FatCommunity.Models.Restaurant
+@{
+    ViewData["Title"] = "Create Restaurant";
+}
+
+<div class="form-panel">
+    <div class="form-header">
+        <h1>Create Restaurant</h1>
+        <div class="form-help">Add a new place to review 🍊</div>
+    </div>
+
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <div class="row g-3">
+            <div class="col-12 col-lg-7">
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" placeholder="e.g., Il Forno"/>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Category" class="form-label"></label>
+                    <input asp-for="Category" class="form-control" placeholder="Restaurant, Fast Food, Cafe..."/>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Street" class="form-label"></label>
+                    <input asp-for="Street" class="form-control" placeholder="Street + number"/>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="City" class="form-label"></label>
+                    <input asp-for="City" class="form-control" placeholder="City"/>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PhotoUrl" class="form-label"></label>
+                    <input asp-for="PhotoUrl" class="form-control" id="PhotoUrl"
+                           placeholder="Paste an image URL (optional)"/>
+                    <div class="form-text">Tip: Use a direct image link.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="5"
+                              placeholder="What’s special about this place?"></textarea>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-5">
+                <label class="form-label">Photo preview</label>
+                <img class="preview" id="photoPreview" alt="Photo preview"/>
+                <div class="form-text mt-2">Preview appears when a valid URL is entered.</div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create</button>
+            <a asp-action="Index" class="btn btn-outline-primary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (function () {
+            const input = document.getElementById('PhotoUrl');
+            const img = document.getElementById('photoPreview');
+
+            function update() {
+                const url = (input.value || '').trim();
+                if (!url) {
+                    img.classList.remove('show');
+                    img.removeAttribute('src');
+                    return;
+                }
+                img.src = url;
+                img.classList.add('show');
+            }
+
+            input.addEventListener('input', update);
+            update();
+        })();
+    </script>
+}

@@ -1,0 +1,92 @@
+﻿@model FatCommunity.Models.MenuItem
+@{
+    ViewData["Title"] = "Add Menu Item";
+}
+
+<div class="form-panel">
+    <div class="form-header">
+        <h1>Add Menu Item</h1>
+        <div class="form-help">For: <strong>@ViewBag.RestaurantName</strong></div>
+    </div>
+
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+        <input type="hidden" asp-for="RestaurantId"/>
+
+        <div class="row g-3">
+            <div class="col-12 col-lg-7">
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" placeholder="e.g., Pizza Diavola"/>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Category" class="form-label"></label>
+                    <input asp-for="Category" class="form-control" placeholder="Pizza, Drink, Dessert..."/>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Price" class="form-label"></label>
+                    <input asp-for="Price" class="form-control" type="number" step="0.01" placeholder="e.g., 24.50"/>
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PhotoUrl" class="form-label"></label>
+                    <input asp-for="PhotoUrl" class="form-control" id="PhotoUrl" placeholder="Paste image URL (optional)"/>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <textarea asp-for="Description" class="form-control" rows="5"
+                              placeholder="What is it like? Ingredients? Portion size?"></textarea>
+                </div>
+
+                <div class="form-check mb-2">
+                    <input asp-for="IsAvailable" class="form-check-input"/>
+                    <label asp-for="IsAvailable" class="form-check-label fw-bold"></label>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-5">
+                <label class="form-label">Photo preview</label>
+                <img class="preview" id="photoPreview" alt="Photo preview"/>
+                <div class="form-text mt-2">Preview appears when a valid URL is entered.</div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create</button>
+            <a class="btn btn-outline-primary"
+               asp-controller="Restaurants"
+               asp-action="Details"
+               asp-route-id="@Model.RestaurantId">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (function () {
+            const input = document.getElementById('PhotoUrl');
+            const img = document.getElementById('photoPreview');
+
+            function update() {
+                const url = (input.value || '').trim();
+                if (!url) {
+                    img.classList.remove('show');
+                    img.removeAttribute('src');
+                    return;
+                }
+                img.src = url;
+                img.classList.add('show');
+            }
+
+            input.addEventListener('input', update);
+            update();
+        })();
+    </script>
+}

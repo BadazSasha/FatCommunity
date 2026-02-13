@@ -1,0 +1,135 @@
+﻿@model FatCommunity.ViewModels.MenuItemDetailsVm
+@{
+    ViewData["Title"] = "Menu Item Details";
+}
+
+<div class="mb-3">
+    <a class="back-link"
+       asp-controller="Restaurants"
+       asp-action="Details"
+       asp-route-id="@Model.MenuItem.RestaurantId">
+        ← Back to @Model.MenuItem.Restaurant.Name
+    </a>
+</div>
+
+<div class="item-hero mb-4">
+    @if (!string.IsNullOrWhiteSpace(Model.MenuItem.PhotoUrl))
+    {
+        <img class="item-photo" src="@Model.MenuItem.PhotoUrl" alt="@Model.MenuItem.Name" />
+    }
+    else
+    {
+        <div class="item-photo"></div>
+    }
+
+    <div>
+        <h1 class="hero-title mb-1">@Model.MenuItem.Name</h1>
+
+        <div class="kicker">
+            @Model.MenuItem.Restaurant.Name
+        </div>
+
+        <div class="pills">
+            <span class="pill">💰 <strong>@Model.MenuItem.Price.ToString("C")</strong></span>
+
+            @if (!string.IsNullOrWhiteSpace(Model.MenuItem.Category))
+            {
+                <span class="pill">🍊 <strong>@Model.MenuItem.Category</strong></span>
+            }
+
+            <span class="pill">
+                @if (Model.MenuItem.IsAvailable)
+                {
+                    <span>Available ✅</span>
+                }
+                else
+                {
+                    <span>Unavailable ❌</span>
+                }
+            </span>
+
+            <span class="pill">
+                ⭐
+                @if (Model.ReviewCount == 0)
+                {
+                    <span class="small-muted">No reviews yet</span>
+                }
+                else
+                {
+                    <strong>@Model.AvgRating.ToString("0.0")</strong>
+                    <span class="small-muted">/5 (@Model.ReviewCount)</span>
+                }
+            </span>
+        </div>
+
+        <div class="mt-3 d-flex flex-wrap gap-2">
+            <a class="btn btn-primary"
+               asp-controller="MenuItemReviews"
+               asp-action="Create"
+               asp-route-menuItemId="@Model.MenuItem.Id">
+                Add Review
+            </a>
+
+            <a class="btn btn-outline-primary"
+               asp-controller="MenuItems"
+               asp-action="Edit"
+               asp-route-id="@Model.MenuItem.Id">
+                Edit Item
+            </a>
+
+            <a class="btn btn-outline-primary"
+               asp-controller="MenuItems"
+               asp-action="Delete"
+               asp-route-id="@Model.MenuItem.Id">
+                Delete Item
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="panel mb-4">
+    <h2 class="section-title mb-2">About this item</h2>
+
+    @if (string.IsNullOrWhiteSpace(Model.MenuItem.Description))
+    {
+        <p class="desc-text subtle">No description yet.</p>
+    }
+    else
+    {
+        <p class="desc-text">@Model.MenuItem.Description</p>
+    }
+</div>
+
+<h2 class="section-title">Reviews</h2>
+
+@if (Model.Reviews.Count == 0)
+{
+    <div class="panel">
+        <p class="m-0 subtle">No reviews yet.</p>
+    </div>
+}
+else
+{
+    <div class="d-grid gap-3">
+        @foreach (var review in Model.Reviews)
+        {
+            <div class="review-card">
+                <div class="review-head">
+                    <div>
+                        <div class="review-title">
+                            <partial name="_StarRating" model="(double)review.Rating" />
+                        </div>
+                        <div class="review-meta">
+                            by @review.ReviewerName • @review.CreatedAtUtc.ToLocalTime().ToString("g")
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(review.Body))
+                {
+                    <div class="review-body">@review.Body</div>
+                }
+            </div>
+        }
+    </div>
+}

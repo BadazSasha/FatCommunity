@@ -1,0 +1,25 @@
+﻿@model double
+
+@{
+    var rating = Model;
+    var fullStars = (int)Math.Floor(rating);
+    var hasHalf = rating - fullStars >= 0.5;
+    var emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+}
+
+<span class="stars">
+    @for (int i = 0; i < fullStars; i++)
+    {
+        <span class="star full">★</span>
+    }
+
+    @if (hasHalf)
+    {
+        <span class="star half">★</span>
+    }
+
+    @for (int i = 0; i < emptyStars; i++)
+    {
+        <span class="star empty">★</span>
+    }
+</span>

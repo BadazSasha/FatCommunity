@@ -1,0 +1,67 @@
+﻿@model FatCommunity.Models.RestaurantReview
+@{
+    ViewData["Title"] = "Add Restaurant Review";
+}
+
+<div class="form-panel">
+    <div class="form-header">
+        <h1>Add Review</h1>
+        <div class="form-help">For: <strong>@ViewBag.RestaurantName</strong></div>
+    </div>
+
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <input type="hidden" asp-for="RestaurantId"/>
+
+        <div class="row g-3">
+            <div class="col-12 col-lg-6">
+                <div class="mb-3">
+                    <label asp-for="ReviewerName" class="form-label">Your name</label>
+                    <input asp-for="ReviewerName" class="form-control" placeholder="e.g., Sasha" />
+                    <span asp-validation-for="ReviewerName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Rating" class="form-label"></label>
+                    <select asp-for="Rating" class="form-select">
+                        <option value="1">1 - Bad</option>
+                        <option value="2">2 - Meh</option>
+                        <option value="3">3 - Okay</option>
+                        <option value="4">4 - Good</option>
+                        <option value="5">5 - Amazing</option>
+                    </select>
+                    <span asp-validation-for="Rating" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label"></label>
+                    <input asp-for="Title" class="form-control" placeholder="Short summary (optional)" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+                <div class="mb-3">
+                    <label asp-for="Body" class="form-label"></label>
+                    <textarea asp-for="Body" class="form-control" rows="8"
+                              placeholder="Tell people what you liked (service, taste, value, etc.)"></textarea>
+                    <span asp-validation-for="Body" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit Review</button>
+
+            <a class="btn btn-outline-primary"
+               asp-controller="Restaurants"
+               asp-action="Details"
+               asp-route-id="@Model.RestaurantId">Cancel</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

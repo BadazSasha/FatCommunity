@@ -1,0 +1,79 @@
+﻿@model List<FatCommunity.ViewModels.RestaurantIndexVm>
+
+@{
+    ViewData["Title"] = "Restaurants";
+}
+
+<div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
+    <div>
+        <h1 class="page-title mb-1">Restaurants</h1>
+        <div class="subtle">Browse places, menus, and reviews.</div>
+    </div>
+
+    <div>
+        <a class="btn btn-primary" asp-action="Create">Add Restaurant</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    @foreach (var r in Model)
+    {
+        <div class="col-12 col-md-6 col-lg-4">
+            <a class="card-link" asp-action="Details" asp-route-id="@r.Id">
+                <div class="restaurant-card">
+                    @* Photo placeholder if missing *@
+                    @if (!string.IsNullOrWhiteSpace(r.PhotoUrl))
+                    {
+                        <img class="restaurant-photo" src="@r.PhotoUrl" alt="@r.Name" />
+                    }
+                    else
+                    {
+                        <div class="restaurant-photo"></div>
+                    }
+
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <div>
+                                <div class="h5 fw-bold mb-1">@r.Name</div>
+                                <div class="subtle">@r.City</div>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(r.Category))
+                            {
+                                <span class="badge badge-orange">@r.Category</span>
+                            }
+                        </div>
+
+                        <div class="meta-row mt-3">
+                            <span class="meta-pill">
+                                @if (r.ReviewCount == 0)
+                                {
+                                    <span class="subtle">No reviews</span>
+                                }
+                                else
+                                {
+                                    @if (r.ReviewCount == 0)
+                                    {
+                                        <span class="subtle">No reviews</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="rating-badge">
+                                            <partial name="_StarRating" model="r.AvgRating" />
+                                            <span>@r.AvgRating.ToString("0.0")</span>
+                                            <small>(@r.ReviewCount)</small>
+                                        </span>
+                                    }
+
+                                    
+                                }
+                            </span>
+
+                            <span class="meta-pill">Tap to open</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    }
+</div>

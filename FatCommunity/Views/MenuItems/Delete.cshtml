@@ -1,0 +1,19 @@
+﻿@model FatCommunity.Models.MenuItem
+@{
+    ViewData["Title"] = "Delete Menu Item";
+}
+
+<h1>Delete Menu Item</h1>
+
+<div class="alert alert-warning">
+    Delete <strong>@Model.Name</strong> from <strong>@Model.Restaurant.Name</strong>?
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id"/>
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a class="btn btn-secondary"
+       asp-controller="Restaurants"
+       asp-action="Details"
+       asp-route-id="@Model.RestaurantId">Cancel</a>
+</form>

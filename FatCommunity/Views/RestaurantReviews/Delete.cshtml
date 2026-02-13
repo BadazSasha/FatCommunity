@@ -1,0 +1,31 @@
+﻿@model FatCommunity.Models.RestaurantReview
+@{
+    ViewData["Title"] = "Delete Review";
+}
+
+<div class="form-panel">
+    <div class="form-header">
+        <h1>Delete Review</h1>
+        <div class="form-help">This cannot be undone</div>
+    </div>
+
+    <div class="panel mb-3">
+        <div class="review-title">⭐ @Model.Rating / 5 — @Model.Title</div>
+        <div class="review-meta">by @Model.ReviewerName • @Model.CreatedAtUtc.ToLocalTime().ToString("g")</div>
+        @if (!string.IsNullOrWhiteSpace(Model.Body))
+        {
+            <div class="review-body">@Model.Body</div>
+        }
+    </div>
+
+    <form asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Id"/>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a class="btn btn-outline-primary"
+               asp-controller="Restaurants"
+               asp-action="Details"
+               asp-route-id="@Model.RestaurantId">Cancel</a>
+        </div>
+    </form>
+</div>
