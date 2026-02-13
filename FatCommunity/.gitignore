@@ -1,0 +1,22 @@
+﻿# Rider / IntelliJ
+.idea/
+*.sln.iml
+
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+
+# ASP.NET
+appsettings.Development.json
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
