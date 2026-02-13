@@ -16,27 +16,84 @@ public class RestaurantsController : Controller
     }
 
     // GET: /Restaurants
-    public async Task<IActionResult> Index()
-    {
-        var restaurants = await _db.Restaurants
-            .OrderBy(r => r.Name)
-            .Select(r => new RestaurantIndexVm
-            {
-                Id = r.Id,
-                Name = r.Name,
-                City = r.City,
-                Category = r.Category,
-                PhotoUrl = r.PhotoUrl,
-                AvgRating = _db.RestaurantReviews
-                    .Where(rr => rr.RestaurantId == r.Id)
-                    .Select(rr => (double?)rr.Rating)
-                    .Average() ?? 0,
-                ReviewCount = _db.RestaurantReviews.Count(rr => rr.RestaurantId == r.Id)
-            })
-            .ToListAsync();
+    // Supports filters via query string:
+    // /Restaurants?category=Fast%20Food&minStars=4&minReviews=2
+    // GET: /Restaurants
+    [HttpGet]
+public async Task<IActionResult> Index(string? category, int? minStars, int? minReviews, string? sort)
+{
+    // Base query: compute AvgRating + ReviewCount per restaurant
+    var query =
+        from r in _db.Restaurants.AsNoTracking()
+        join rr in _db.RestaurantReviews.AsNoTracking()
+            on r.Id equals rr.RestaurantId into reviews
+        select new
+        {
+            Restaurant = r,
+            ReviewCount = reviews.Count(),
+            AvgRating = reviews.Select(x => (double?)x.Rating).Average() ?? 0.0
+        };
 
-        return View(restaurants);
-    }
+    // Filters
+    if (!string.IsNullOrWhiteSpace(category))
+        query = query.Where(x => x.Restaurant.Category == category);
+
+    if (minStars.HasValue)
+        query = query.Where(x => x.AvgRating >= minStars.Value);
+
+    if (minReviews.HasValue)
+        query = query.Where(x => x.ReviewCount >= minReviews.Value);
+
+    // Sorting
+    sort = string.IsNullOrWhiteSpace(sort) ? "TopRated" : sort;
+
+    query = sort switch
+    {
+        "MostReviewed" => query
+            .OrderByDescending(x => x.ReviewCount)
+            .ThenByDescending(x => x.AvgRating)
+            .ThenBy(x => x.Restaurant.Name),
+
+        "Name" => query
+            .OrderBy(x => x.Restaurant.Name),
+
+        "Newest" => query
+            .OrderByDescending(x => x.Restaurant.CreatedAtUtc)
+            .ThenBy(x => x.Restaurant.Name),
+
+        _ => query // TopRated (default)
+            .OrderByDescending(x => x.AvgRating)
+            .ThenByDescending(x => x.ReviewCount)
+            .ThenBy(x => x.Restaurant.Name)
+    };
+
+    var restaurants = await query
+        .Select(x => new RestaurantIndexVm
+        {
+            Id = x.Restaurant.Id,
+            Name = x.Restaurant.Name,
+            City = x.Restaurant.City,
+            Category = x.Restaurant.Category,
+            PhotoUrl = x.Restaurant.PhotoUrl,
+            AvgRating = x.AvgRating,
+            ReviewCount = x.ReviewCount
+        })
+        .ToListAsync();
+
+    var vm = new RestaurantsIndexPageVm
+    {
+        Restaurants = restaurants,
+        SelectedCategory = category,
+        SelectedMinStars = minStars,
+        SelectedMinReviews = minReviews,
+        CategoryOptions = new List<string> { "Fast Food", "Restaurant and pub", "Fancy Restaurant" },
+
+        SelectedSort = sort
+    };
+
+    return View(vm);
+}
+
 
     // GET: /Restaurants/Details/5
     public async Task<IActionResult> Details(int? id)
@@ -81,7 +138,6 @@ public class RestaurantsController : Controller
 
         return View(vm);
     }
-
 
     // GET: /Restaurants/Create
     public IActionResult Create()
