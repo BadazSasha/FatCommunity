@@ -2,69 +2,22 @@
 
 @{
     ViewData["Title"] = "Restaurants";
+    var i = 0; // for staggered card animation
 }
 
-<div class="d-flex align-items-end justify-content-between flex-wrap gap-2 mb-3">
+<div class="d-flex align-items-end justify-content-between flex-wrap gap-3 mb-3">
     <div>
         <h1 class="page-title mb-1">Restaurants</h1>
-        <div class="subtle">Filter by type, rating, reviews and sort results.</div>
+        <div class="subtle">Sort quickly, open filters when needed.</div>
     </div>
 
-    <div>
-        <a class="btn btn-primary" asp-action="Create">Add Restaurant</a>
-    </div>
-</div>
+    <!-- SORT + FILTERS + ADD -->
+    <form method="get" class="d-flex flex-wrap align-items-center gap-2">
 
-<!-- FILTER + SORT PANEL -->
-<div class="panel mb-4">
-    <form method="get" class="row g-3 align-items-end">
-
-        <!-- CATEGORY -->
-        <div class="col-12 col-md-3">
-            <label class="form-label">Type</label>
-            <select class="form-select" name="category">
-                <option value="">All types</option>
-                @foreach (var c in Model.CategoryOptions)
-                {
-                    <option value="@c" selected="@(c == Model.SelectedCategory)">
-                        @c
-                    </option>
-                }
-            </select>
-        </div>
-
-        <!-- STARS -->
-        <div class="col-12 col-md-3">
-            <label class="form-label">Minimum stars</label>
-            <select class="form-select" name="minStars">
-                <option value="">Any</option>
-                @for (int i = 5; i >= 1; i--)
-                {
-                    <option value="@i" selected="@(Model.SelectedMinStars == i)">
-                        @i+ stars
-                    </option>
-                }
-            </select>
-        </div>
-
-        <!-- REVIEWS -->
-        <div class="col-12 col-md-3">
-            <label class="form-label">Minimum reviews</label>
-            <select class="form-select" name="minReviews">
-                <option value="">Any</option>
-                @foreach (var n in new[] { 0, 1, 2, 5, 10, 20 })
-                {
-                    <option value="@n" selected="@(Model.SelectedMinReviews == n)">
-                        @n+ reviews
-                    </option>
-                }
-            </select>
-        </div>
-
-        <!-- SORT -->
-        <div class="col-12 col-md-3">
-            <label class="form-label">Sort</label>
-            <select class="form-select" name="sort">
+        <!-- SORT (separate, always visible) -->
+        <div style="min-width: 220px;">
+            <label class="form-label mb-1">Sort</label>
+            <select class="form-select" name="sort" onchange="this.form.submit()">
                 <option value="TopRated" selected="@(Model.SelectedSort == "TopRated")">Top rated</option>
                 <option value="MostReviewed" selected="@(Model.SelectedSort == "MostReviewed")">Most reviewed</option>
                 <option value="Name" selected="@(Model.SelectedSort == "Name")">Name (A–Z)</option>
@@ -72,16 +25,68 @@
             </select>
         </div>
 
-        <!-- ACTIONS -->
-        <div class="col-12 d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Apply</button>
-            <a asp-action="Index" class="btn btn-outline-primary">Clear</a>
+        <!-- FILTER DROPDOWN -->
+        <div class="dropdown" style="margin-top: 24px;">
+            <button class="btn btn-outline-primary dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    data-bs-auto-close="outside"
+                    aria-expanded="false">
+                Filters
+            </button>
+
+            <div class="dropdown-menu p-3" style="min-width: 320px;">
+                <div class="mb-3">
+                    <label class="form-label">Type</label>
+                    <select class="form-select" name="category">
+                        <option value="">All types</option>
+                        @foreach (var c in Model.CategoryOptions)
+                        {
+                            <option value="@c" selected="@(c == Model.SelectedCategory)">@c</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Minimum stars</label>
+                    <select class="form-select" name="minStars">
+                        <option value="">Any</option>
+                        @for (int s = 5; s >= 1; s--)
+                        {
+                            <option value="@s" selected="@(Model.SelectedMinStars == s)">@s+ stars</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Minimum reviews</label>
+                    <select class="form-select" name="minReviews">
+                        <option value="">Any</option>
+                        @foreach (var n in new[] { 0, 1, 2, 5, 10, 20 })
+                        {
+                            <option value="@n" selected="@(Model.SelectedMinReviews == n)">@n+ reviews</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                    <a asp-action="Index" class="btn btn-outline-primary">Clear</a>
+                </div>
+
+                <div class="form-text mt-2">
+                    Tip: Sort applies instantly; filters apply when you click “Apply”.
+                </div>
+            </div>
         </div>
 
+        <!-- ADD -->
+        <div style="margin-top: 24px;">
+            <a class="btn btn-primary" asp-action="Create">Add Restaurant</a>
+        </div>
     </form>
 </div>
 
-<!-- RESULTS -->
 @if (Model.Restaurants.Count == 0)
 {
     <div class="panel">
@@ -93,15 +98,13 @@ else
     <div class="row g-4">
         @foreach (var r in Model.Restaurants)
         {
-            <div class="col-12 col-md-6 col-lg-4">
+            <div class="col-12 col-md-6 col-lg-4 card-animate" style="animation-delay:@(i * 45)ms">
                 <a asp-action="Details"
                    asp-route-id="@r.Id"
                    class="card-link"
                    style="text-decoration:none">
 
                     <div class="menu-card">
-
-                        <!-- PHOTO -->
                         @if (!string.IsNullOrWhiteSpace(r.PhotoUrl))
                         {
                             <img src="@r.PhotoUrl"
@@ -113,7 +116,6 @@ else
                             <div style="width:100%; height:180px; background:#f1f5f9;"></div>
                         }
 
-                        <!-- BODY -->
                         <div class="menu-card-body">
                             <div class="d-flex justify-content-between align-items-start gap-2">
                                 <div>
@@ -123,9 +125,7 @@ else
 
                                 @if (!string.IsNullOrWhiteSpace(r.Category))
                                 {
-                                    <span class="pill">
-                                        <strong>@r.Category</strong>
-                                    </span>
+                                    <span class="pill"><strong>@r.Category</strong></span>
                                 }
                             </div>
 
@@ -145,15 +145,15 @@ else
                             </div>
                         </div>
 
-                        <!-- FOOTER -->
                         <div class="card-actions">
                             <span class="small-muted">Click card to open</span>
                             <span class="link-orange">Open →</span>
                         </div>
-
                     </div>
                 </a>
             </div>
+
+            i++;
         }
     </div>
 }

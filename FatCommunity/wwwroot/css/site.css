@@ -538,5 +538,112 @@ body {
   color: var(--ink-500);
   font-weight: 700;
 }
+/* Button hover / focus / active */
+.dropdown .btn-outline-primary:hover,
+.dropdown .btn-outline-primary:focus,
+.dropdown .btn-outline-primary:active,
+.dropdown .btn-outline-primary.show {
+  color: #fff;
+  background-color: var(--orange-600);
+  border-color: var(--orange-600);
+  box-shadow: none;
+}
 
+/* Remove Bootstrap blue focus ring */
+.dropdown .btn-outline-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.35);
+}
+
+/* Dropdown menu hover items */
+.dropdown-menu .dropdown-item:hover,
+.dropdown-menu .dropdown-item:focus {
+  background-color: var(--orange-50);
+  color: var(--ink-900);
+}
+
+/* Prevent blue background flash when clicking inside dropdown */
+.dropdown-menu {
+  --bs-dropdown-link-active-bg: var(--orange-50);
+  --bs-dropdown-link-active-color: var(--ink-900);
+}
+/* =========================
+   Animations (refined)
+   ========================= */
+
+/* Keep hover/press subtle */
+a, button, .btn, .pill, .rating-badge {
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background-color 160ms ease, color 160ms ease, opacity 160ms ease;
+}
+
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0px) scale(0.98); }
+
+/* Card hover remains subtle */
+.menu-card, .restaurant-card {
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, opacity 160ms ease;
+}
+.menu-card:hover,
+.restaurant-card:hover {
+  transform: translateY(-3px);
+}
+
+/* ===== Page-load card animation (staggered) ===== */
+.card-animate {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: cardIn 420ms ease-out forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes cardIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Dropdown animation without position jump =====
+   Bootstrap toggles .show (and display). We animate using visibility/opacity only,
+   so layout doesn't shift and the menu doesn't "jump". */
+.dropdown-menu {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: none; /* important: avoid layout/position jump */
+  transition: opacity 140ms ease, visibility 140ms ease;
+}
+
+.dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Optional: slight fade-in polish (no movement) */
+.dropdown-menu.show {
+  animation: dropdownFade 140ms ease-out;
+}
+
+@keyframes dropdownFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Stars: small pulse on hover (optional but nice) */
+.rating-badge:hover .star.full,
+.rating-badge:hover .star.half {
+  animation: starPulse 420ms ease-in-out;
+}
+
+@keyframes starPulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
 
